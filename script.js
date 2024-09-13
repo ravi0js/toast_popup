@@ -1,32 +1,47 @@
-function updateDurationDisplay() {
-  const duration = document.getElementById("duration").value;
-  const durationMsg = document.getElementById("duration_msg");
-  durationMsg.innerText = `Duration: ${duration} ms (${(
-    duration / 1000
-  ).toFixed(1)} s)`;
-}
+// Selecting elements for later use
+const showToastBtn = document.querySelector(".show-toast");
+const horizontalPosition = document.querySelector("#horizontal-position");
+const verticalPosition = document.querySelector("#vertical-position");
+const toastType = document.querySelector("#toast-type");
+const toastMessage = document.querySelector("#toast-message");
+const toastsContainer = document.querySelector(".toasts-container");
+const durationInput = document.querySelector("#duration");
 
-document.getElementById("duration").addEventListener("input", updateDurationDisplay);
+showToastBtn.addEventListener("click", () => {
+  // Set the position based on the dropdown values
+  toastsContainer.classList.toggle(
+    "right",
+    horizontalPosition.value === "right"
+  );
+  toastsContainer.classList.toggle(
+    "bottom",
+    verticalPosition.value === "bottom"
+  );
 
-updateDurationDisplay();
+  // Create new toast
+  const newToast = document.createElement("div");
+  newToast.classList.add("toast", toastType.value); // Added toast type in one line
 
-document.getElementById("showToast").addEventListener("click", function () {
-  const positionX = document.getElementById("positionX").value;
-  const positionY = document.getElementById("positionY").value;
-  const type = document.getElementById("type").value;
-  const message = document.getElementById("message").value;
-  const duration = document.getElementById("duration").value;
+  newToast.textContent = ` ${toastMessage.value}`; // Direct text content setting
 
-  const toast = document.getElementById("toast");
+  const closeIcon = document.createElement("span");
+  closeIcon.textContent = " ✕"; // Used textContent for better performance
+  newToast.append(closeIcon);
 
-  toast.innerText = message;
-  toast.className = `toast ${positionX} ${positionY} ${type}`;
+  // Function to remove the toast
+  const removeToast = () => {
+    newToast.classList.add(
+      toastsContainer.classList.contains("right") ? "go-right" : "go-left"
+    );
+    setTimeout(() => newToast.remove(), 100);
+  };
 
-  toast.style.display = "block";
-  toast.style.animation = `fadeInOut ${duration / 1000}s forwards`;
+  // Close toast on clicking the close icon
+  closeIcon.addEventListener("click", removeToast);
 
+  // Automatically remove the toast after the specified duration
+  setTimeout(removeToast, parseInt(durationInput.value) * 1000);
 
-setTimeout(() => {
-    toast.style.display = "none";
-  }, duration);
+  // Append the toast to the container
+  toastsContainer.append(newToast);
 });
